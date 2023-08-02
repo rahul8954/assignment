@@ -23,7 +23,8 @@ COPY main.go .
 RUN go mod init app && go get -u github.com/codegangsta/negroni github.com/gorilla/mux github.com/go-redis/redis
 
 # Build the Go application
-RUN CGO_ENABLED=0 GOOS=linux go build -o main .
+CGO_ENABLED=0 GOOS=linux go build -o main .
+
 
 # Create a minimal image for deployment
 FROM scratch
