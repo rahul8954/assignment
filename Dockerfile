@@ -12,19 +12,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM golang:1.10.0
-RUN go get github.com/codegangsta/negroni \
-           github.com/gorilla/mux \
-           github.com/xyproto/simpleredis
+#  a more recent Go version
+FROM golang:1.17
+
+# Set the working directory and copy the Go application files
 WORKDIR /app
-ADD ./main.go .
+COPY main.go .
+
+# Install and fetch Go modules
+RUN go mod init app && go get -u github.com/codegangsta/negroni github.com/gorilla/mux github.com/go-redis/redis
+
+# Build the Go application
 RUN CGO_ENABLED=0 GOOS=linux go build -o main .
 
+# Create a minimal image for deployment
 FROM scratch
 WORKDIR /app
 COPY --from=0 /app/main .
-COPY ./public/index.html public/index.html
-COPY ./public/script.js public/script.js
-COPY ./public/style.css public/style.css
 CMD ["/app/main"]
 EXPOSE 3000
+
