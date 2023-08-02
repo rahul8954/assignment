@@ -14,7 +14,7 @@
 
 #  a more recent Go version
 # Use a more recent Go version
-FROM golang:1.17 AS builder
+FROM golang:1.17
 
 # Set the working directory and copy the Go application files
 WORKDIR /app
