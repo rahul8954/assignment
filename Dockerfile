@@ -13,7 +13,8 @@
 # limitations under the License.
 
 #  a more recent Go version
-FROM golang:1.17
+# Use a more recent Go version
+FROM golang:1.17 AS builder
 
 # Set the working directory and copy the Go application files
 WORKDIR /app
@@ -23,13 +24,19 @@ COPY main.go .
 RUN go mod init app && go get -u github.com/codegangsta/negroni github.com/gorilla/mux github.com/go-redis/redis
 
 # Build the Go application
-CGO_ENABLED=0 GOOS=linux go build -o main .
-
+RUN CGO_ENABLED=0 GOOS=linux go build -o main .
 
 # Create a minimal image for deployment
 FROM scratch
 WORKDIR /app
-COPY --from=0 /app/main .
-CMD ["/app/main"]
+
+# Copy the built executable from the builder stage
+COPY --from=builder /app/main .
+
+# Set the command to run the application
+CMD ["./main"]
+
+# Expose the port on which your Go application listens
 EXPOSE 3000
+
 
