@@ -25,11 +25,12 @@ jobs:
           tags: rahulgangwar8954/guestbook-go:latest
 
       - name: Check Commit Message and Share GitHub Repo Link
-        if: contains(github.event.head_commit.message, 'BUILD_CONTAINER_IMAGE')
         run: |
-          echo "BUILD_CONTAINER_IMAGE string found in commit message. Proceeding to share the link."
-          REPO_URL=$(git config --get remote.origin.url)
-          echo "Repository URL: $REPO_URL"
-          # Add your code here to send the link via email, e.g., use a command-line email client like 'mailx' or 'sendmail'
-        else
-          echo "No 'BUILD_CONTAINER_IMAGE' string found in commit message. Skipping sharing the link."
+          if [[ "${{ github.event.head_commit.message }}" == *"BUILD_CONTAINER_IMAGE"* ]]; then
+            echo "BUILD_CONTAINER_IMAGE string found in commit message. Proceeding to share the link."
+            REPO_URL=$(git config --get remote.origin.url)
+            echo "Repository URL: $REPO_URL"
+            # Add your code here to send the link via email, e.g., use a command-line email client like 'mailx' or 'sendmail'
+          else
+            echo "No 'BUILD_CONTAINER_IMAGE' string found in commit message. Skipping sharing the link."
+          fi
