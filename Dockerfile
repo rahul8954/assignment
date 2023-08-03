@@ -12,31 +12,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-#  a more recent Go version
-# Use a more recent Go version
-FROM golang:1.17 AS builder
 
-# Set the working directory and copy the Go application files
+FROM golang:1.10.0
+RUN go get -u github.com/codegangsta/negroni
+RUN go get -u github.com/gorilla/mux
+RUN go get -u github.com/xyproto/simpleredis/v2
 WORKDIR /app
-COPY main.go .
-
-# Install and fetch Go modules
-RUN go mod init app && go get -u github.com/codegangsta/negroni github.com/gorilla/mux github.com/go-redis/redis
-
-# Build the Go application
+ADD ./main.go .
 RUN CGO_ENABLED=0 GOOS=linux go build -o main .
 
-# Create a minimal image for deployment
 FROM scratch
 WORKDIR /app
-
-# Copy the built executable from the builder stage
-COPY --from=builder /app/main .
-
-# Set the command to run the application
-CMD ["./main"]
-
-# Expose the port on which your Go application listens
+COPY --from=0 /app/main .
+COPY ./public/index.html public/index.html
+COPY ./public/script.js public/script.js
+COPY ./public/style.css public/style.css
+CMD ["/app/main"]
 EXPOSE 3000
+
+
 
 
