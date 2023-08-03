@@ -1,0 +1,35 @@
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types: [closed]
+
+jobs:
+  push_to_registry:
+    name: Push Docker image to Docker Hub
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v3
+      
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_TOKEN }}
+      
+      - name: Check if the main branch is the source of the push event
+        id: check_push_source
+        run: echo ::set-output name=IS_MAIN_BRANCH::$(echo "${{ github.ref }}" | cut -d'/' -f3)
+      
+      - name: Check commit message for BUILD_CONTAINER_IMAGE
+        id: check_commit_message
+        run: echo ::set-output name=HAS_BUILD_TAG::$(git log --format=%B -n 1 ${{ github.sha }} | grep -c "BUILD_CONTAINER_IMAGE")
+      
+      - name: Build and push Docker Image
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          push: ${{ steps.check_push_source.outputs.IS_MAIN_BRANCH == 'main' || steps.check_commit_message.outputs.HAS_BUILD_TAG > 0 }}
+          tags: rahulgangwar8954/guestbook-go:latest
