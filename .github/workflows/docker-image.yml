@@ -17,7 +17,7 @@ jobs:
       - name: Enforce merge review for main branch
         if: github.ref == 'refs/heads/master'
         run: |
-          echo "Please ensure that all changes are reviewed before merging into the master branch."
+          echo "Please ensure that all changes are reviewed before merging into the master branch"
           exit 1
 
       - name: Login to Docker Hub
