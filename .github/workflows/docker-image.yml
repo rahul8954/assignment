@@ -31,5 +31,5 @@ jobs:
           REPO_URL=$(git config --get remote.origin.url)
           echo "Repository URL: $REPO_URL"
           # Add your code here to send the link via email, e.g., use a command-line email client like 'mailx' or 'sendmail'
-        else:
+        else
           echo "No 'BUILD_CONTAINER_IMAGE' string found in commit message. Skipping sharing the link."
